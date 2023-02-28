@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<nav class="navbar navbar-expand-lg sticky-top" style="background-color: #b8d2a8;">
+    <div class="container-fluid px-5 py-2">
+    <a class="navbar-brand" th:href="@{/}">🌱 부추 농장</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li sec:authorize="isAnonymous()" class="nav-item">
+                <a class="nav-link" th:href="@{/u/login}">로그인</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/i}">사이트 설명</a>
+            </li>
+            <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span th:text="${session.user.name}"></span>님
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" th:href="@{${'/'+session.user.userId}}">내 농장</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" th:href="@{/u/logout}">로그아웃</a></li>
+                </ul>
+            </li>
+        </ul>
+        <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search(준비중)" aria-label="Search" disabled>
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+    </div>
+    </div>
+</nav>

@@ -1,0 +1,47 @@
+package com.buchu.greenfarm.entity;
+
+import com.buchu.greenfarm.code.FarmLogStatusCode;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EntityListeners(AuditingEntityListener.class)
+public class FarmLog extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long farmLogId;
+
+    @NotBlank(message = "내용이 공란이어선 안됩니다.")
+    @Size(max = 300, message = "농장 일기는 300자를 넘겨선 안됩니다!")
+    private String logContent;
+
+    @Enumerated(EnumType.STRING)
+    @NonNull
+    private FarmLogStatusCode farmLogStatusCode;
+
+    @Min(value = 0, message = "댓글 갯수는 음수일 수 없습니다!")
+    private int commentNum;
+
+    @ManyToOne
+    @JoinColumn(name = "author")
+    private User author;
+
+    @OneToMany(mappedBy = "farmLog", cascade = CascadeType.ALL)
+    private List<Good> likers = new ArrayList<>();
+
+    public int getLikeNum() {
+        return likers.size();
+    }
+}

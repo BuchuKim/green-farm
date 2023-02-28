@@ -1,0 +1,81 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${farmLog.authorName+' 일기'}"></title>
+    <link rel="shortcut icon" href="/assets/icons8-seedling-32.png">
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- Template CSS Style link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!--  navbar.html 내의 nav fragment 대체   -->
+<div th:replace="~{layouts/navbar :: nav}">...</div>
+<div class="container mt-5">
+    <div class="row justify-content-center mb-3">
+        <div class="col-10 col-lg-6">
+            <h1 th:text="${farmLog.authorName + '님의 일기 🌿'}" class="text-center fw-bold"></h1>
+        </div>
+    </div>
+    <div class="my-3 d-flex justify-content-center">
+        <a class="btn btn-outline-success"
+           th:href="@{${backURI}}">뒤로가기</a>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-lg-5 justify-content-center mt-3">
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex p-1">
+                            <a class="me-auto text-decoration-none text-black"
+                               th:text="${'@'+farmLog.authorId}"
+                                th:href="@{'/'+${farmLog.authorId}}"></a>
+                            <div th:text="${farmLog.createdAt+' 작성'}"></div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text" th:text="${farmLog.logContent}"></p>
+                        <div class="d-flex">
+                            <div class="ms-auto">
+                                <form class="d-inline"
+                                      sec:authorize="isAuthenticated()"
+                                      th:if="${isLikedByCurrentUser==false}"
+                                      th:action="@{${'/farm-log/like/'+farmLog.farmLogId}}"
+                                      th:method="post">
+                                    <button th:text="${'♡ '+farmLog.likeNum+' 좋아요'}"
+                                       class="btn btn-outline-success btn-sm" type="submit"></button>
+                                </form>
+                                <form class="d-inline"
+                                      sec:authorize="isAuthenticated()"
+                                      th:if="${isLikedByCurrentUser==true}"
+                                      th:action="@{${'/farm-log/like/'+farmLog.farmLogId}}"
+                                      th:method="delete">
+                                    <button th:text="${'♡ '+farmLog.likeNum+' 좋아요 취소'}"
+                                       class="btn btn-success ml-auto btn-sm"></button>
+                                </form>
+                                <button sec:authorize="isAnonymous()" class="btn btn-outline-success btn-sm"
+                                        th:text="${'♡ '+farmLog.likeNum+' 좋아요'}" disabled></button>
+                                <form class="d-inline" th:action="@{${'/farm-log/'+farmLog.farmLogId}}" th:method="delete">
+                                    <button sec:authorize="isAuthenticated()"
+                                       th:if="${session.user.userId==farmLog.authorId}"
+                                       th:text="${'✕ 삭제하기'}"
+                                       class="btn btn-outline-danger btn-sm"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{layouts/footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>
