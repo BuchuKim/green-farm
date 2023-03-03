@@ -242,5 +242,4 @@ gradle-app.setting
 
 
 # Secret Information!
-application-mysql.properties
-application-oauth.properties
+*.properties
