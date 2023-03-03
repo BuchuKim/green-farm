@@ -39,7 +39,7 @@ public class FarmLog extends BaseEntity {
     private User author;
 
     @OneToMany(mappedBy = "farmLog", cascade = CascadeType.ALL)
-    private List<Good> likers = new ArrayList<>();
+    private List<Good> likers;
 
     public int getLikeNum() {
         return likers.size();

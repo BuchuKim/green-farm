@@ -54,18 +54,18 @@ public class User extends BaseEntity {
     private Role role;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<FarmLog> farmLog = new ArrayList<>();
+    private List<FarmLog> farmLog;
 
     // 이 유저가 팔로우하고 있는 사람
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL)
-    private List<Follow> following = new ArrayList<>();
+    private List<Follow> following;
 
     // 이 유저가 팔로우 당하고 있는 사람.. (팔로워!!)
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL)
-    private List<Follow> followed = new ArrayList<>();
+    private List<Follow> followed;
 
     @OneToMany(mappedBy = "liker", cascade = CascadeType.ALL)
-    private List<Good> likeList = new ArrayList<>();
+    private List<Good> likeList;
 
     public String getRoleKey() {
         return role.getKey();
