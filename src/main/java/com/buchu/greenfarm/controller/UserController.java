@@ -29,17 +29,14 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public String getUser(@PathVariable("userId") final String userId,
-                          @RequestParam(value = "like", required = false, defaultValue = "false")
-                                  final Boolean isLike,
+                          @RequestParam(value = "like",
+                                  required = false,
+                                  defaultValue = "false")
+                                    final Boolean isLike,
                           Authentication authentication,
                           Model model) {
         model.addAttribute("userDetail",
                 userService.getUserDetailDto(userId, isLike));
-        model.addAttribute("isFollowing",
-                authentication != null
-                        && authentication.isAuthenticated()
-                        && userService.isFollowing(
-                                getSessionUser().getUserId(), userId));
         model.addAttribute("isLike",isLike);
         return "profile.html";
     }
@@ -62,24 +59,16 @@ public class UserController {
         return "redirect:/u/logout";
     }
 
-    @GetMapping("/{userId}/follow")
-    public String followUser(@PathVariable("userId") final String userId,
-                          Model model) {
-        log.info(getSessionUser().getUserId() +
-                " is trying to follow " +
-                userId);
+    @PostMapping("/{userId}/follow")
+    public String followUser(@PathVariable("userId") final String userId) {
         userService.follow(
                 getSessionUser().getUserId(),
                 userId);
         return "redirect:/"+userId;
     }
 
-    @GetMapping("/{userId}/unfollow")
-    public String unfollowUser(@PathVariable("userId") final String userId,
-                             Model model) {
-        log.info(getSessionUser().getUserId() +
-                " is trying to unfollow " +
-                userId);
+    @DeleteMapping("/{userId}/follow")
+    public String unfollowUser(@PathVariable("userId") final String userId) {
         userService.unfollow(
                 getSessionUser().getUserId(),
                 userId);
@@ -89,8 +78,7 @@ public class UserController {
     @GetMapping("/{userId}/following")
     public String getFollowing(@PathVariable("userId") final String userId,
                                Model model) {
-        model.addAttribute("user",
-                userService.getUserProfileDto(userId));
+        model.addAttribute("userId", userId);
         model.addAttribute("followings",
                 userService.getFollowingUserDto(userId));
         return "following.html";
@@ -99,8 +87,7 @@ public class UserController {
     @GetMapping("/{userId}/follower")
     public String getFollower(@PathVariable("userId") final String userId,
                                Model model) {
-        model.addAttribute("user",
-                userService.getUserProfileDto(userId));
+        model.addAttribute("userId",userId);
         model.addAttribute("followers",
                 userService.getFollowerUserDto(userId));
         return "follower.html";

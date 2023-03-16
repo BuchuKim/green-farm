@@ -21,7 +21,11 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" th:href="@{${'/'+session.user.userId}}">내 농장</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" th:href="@{/u/logout}">로그아웃</a></li>
+                    <li>
+                        <form th:action="@{/u/logout}" th:method="post">
+                            <button class="dropdown-item" th:href="@{/u/logout}">로그아웃</button>
+                        </form>
+                    </li>
                 </ul>
             </li>
         </ul>

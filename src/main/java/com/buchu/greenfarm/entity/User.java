@@ -9,13 +9,11 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -43,9 +41,7 @@ public class User extends BaseEntity {
     // 자기소개
     @Size(max = 150, message = "자기소개 항목은 150자 이하의 길이여야 합니다.")
     private String bio;
-
-    private int logNum;
-
+    
     // OAuth2
     private String registrationId;
     private String oAuth2Id;
@@ -53,18 +49,28 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    // 유저가 가지고 있는 farmLog
+    @OneToMany(mappedBy = "author",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<FarmLog> farmLog;
 
     // 이 유저가 팔로우하고 있는 사람
-    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "following",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<Follow> following;
 
     // 이 유저가 팔로우 당하고 있는 사람.. (팔로워!!)
-    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "followed",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<Follow> followed;
 
-    @OneToMany(mappedBy = "liker", cascade = CascadeType.ALL)
+    // 유저가 좋아요하는 farm 목록
+    @OneToMany(mappedBy = "liker",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<Good> likeList;
 
     public String getRoleKey() {

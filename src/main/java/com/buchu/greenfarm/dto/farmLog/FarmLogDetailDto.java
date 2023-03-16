@@ -1,6 +1,5 @@
 package com.buchu.greenfarm.dto.farmLog;
 
-import com.buchu.greenfarm.code.FarmLogStatusCode;
 import com.buchu.greenfarm.entity.FarmLog;
 import lombok.*;
 
@@ -19,18 +18,14 @@ public class FarmLogDetailDto {
     private String authorId;
     private String authorName;
     private int likeNum;
-    private int commentNum;
     private String createdAt;
-    private FarmLogStatusCode farmLogStatusCode;
 
     public static FarmLogDetailDto fromEntity(FarmLog farmLog) {
         return FarmLogDetailDto.builder()
                 .logContent(farmLog.getLogContent())
                 .authorId(farmLog.getAuthor().getUserId())
                 .authorName(farmLog.getAuthor().getName())
-                .farmLogStatusCode(farmLog.getFarmLogStatusCode())
                 .likeNum(farmLog.getLikeNum())
-                .commentNum(farmLog.getCommentNum())
                 .createdAt(createdAtString(farmLog.getCreatedAt()))
                 .farmLogId(farmLog.getFarmLogId())
                 .build();

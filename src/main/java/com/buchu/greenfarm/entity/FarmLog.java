@@ -1,14 +1,13 @@
 package com.buchu.greenfarm.entity;
 
-import com.buchu.greenfarm.code.FarmLogStatusCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,21 +26,17 @@ public class FarmLog extends BaseEntity {
     @Size(max = 300, message = "농장 일기는 300자를 넘겨선 안됩니다!")
     private String logContent;
 
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    private FarmLogStatusCode farmLogStatusCode;
-
-    @Min(value = 0, message = "댓글 갯수는 음수일 수 없습니다!")
-    private int commentNum;
-
-    @ManyToOne
-    @JoinColumn(name = "author")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "author", updatable = false)
     private User author;
 
-    @OneToMany(mappedBy = "farmLog", cascade = CascadeType.ALL)
+    // 좋아요 한 유저 목록
+    @OneToMany(mappedBy = "farmLog",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<Good> likers;
 
     public int getLikeNum() {
-        return likers.size();
+        return this.likers.size();
     }
 }

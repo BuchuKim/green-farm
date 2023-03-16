@@ -23,6 +23,7 @@ public class UserDetailDto {
     private String bio;
     private int followerNum;
     private int followingNum;
+    private Boolean isFollowing = false;
     private List<FarmLogDto> farmLogs;
 
     public static UserDetailDto fromEntity(User user, List<FarmLog> farmLogs) {
@@ -31,10 +32,19 @@ public class UserDetailDto {
                 .bio(user.getBio())
                 .createdAt(createdAtString(user.getCreatedAt()))
                 .name(user.getName())
-                .followerNum(user.getFollowerNum())
-                .followingNum(user.getFollowingNum())
                 .farmLogs(farmLogs.stream().map(FarmLogDto::fromEntity).collect(Collectors.toList()))
                 .build();
+    }
+
+    public UserDetailDto setIsFollowing(Boolean isFollowing) {
+        this.isFollowing = isFollowing;
+        return this;
+    }
+
+    public UserDetailDto setFollowNums(int followingNum, int followerNum) {
+        this.followingNum = followingNum;
+        this.followerNum = followerNum;
+        return this;
     }
 
     private static String createdAtString(LocalDateTime createdAt) {

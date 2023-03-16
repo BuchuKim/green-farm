@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${user.name+' 님의 팔로워'}"></title>
+    <title th:text="${userId+' 님의 팔로워'}"></title>
     <link rel="shortcut icon" href="/assets/icons8-seedling-32.png">
     <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
     <div class="row justify-content-center">
         <div class="col-10 col-lg-6 mb-3">
             <h1 class="text-center fw-bold"
-                th:text="${'🍀️ '+user.name + ' 님의 팔로워!'}">
+                th:text="${'🍀️ '+userId + ' 님의 팔로워!'}">
             </h1>
         </div>
     </div>

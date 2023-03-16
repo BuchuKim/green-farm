@@ -36,15 +36,24 @@ public class UserService {
     @Transactional
     public UserDetailDto getUserDetailDto(final String userId,
                                           final Boolean isLike) {
-        User foundUser = userRepository.findByUserId(userId)
-                .orElseThrow(()-> new GreenFarmException(
-                        GreenFarmErrorCode.NO_USER_ERROR));
+        User foundUser = getUserByUserId(userId);
+
         List<FarmLog> foundFarmLogs = isLike ?
+                // 좋아요 누른 일기 페이지라면? -> findByLiker (현재 페이지 유저 = 좋아요 누른 사람)
                 goodRepository.findByLikerOrderByCreatedAtDesc(foundUser).stream()
                         .map(Good::getFarmLog)
                         .collect(Collectors.toList()) :
-                farmLogRepository.getByAuthorOrderByCreatedAtDesc(foundUser);
-        return UserDetailDto.fromEntity(foundUser,foundFarmLogs);
+                // 일반 홈이라면 -> findByAuthor (현재 페이지 유저 = 일기 작성한 사람)
+                farmLogRepository.findByAuthorOrderByCreatedAtDesc(foundUser);
+
+        return UserDetailDto.fromEntity(foundUser,foundFarmLogs)
+                .setFollowNums(followRepository.countByFollowing(foundUser),
+                        followRepository.countByFollowed(foundUser))
+                .setIsFollowing(
+                        getSessionUser() != null &&
+                                followRepository.findByFollowingAndFollowed(
+                                    getUserByUserId(getSessionUser().getUserId()),
+                                                foundUser).isPresent());
     }
 
     @Transactional
@@ -74,28 +83,24 @@ public class UserService {
     @Transactional
     public void follow(final String followingId,
                            final String followedId) {
-        if (followedId.equals(followingId)) {
-            throw new GreenFarmException(
-                    GreenFarmErrorCode.CANNOT_FOLLOW);
-        }
         User followed = getUserByUserId(followedId);
         User following = getUserByUserId(followingId);
-        validateFollow(following, followed);
-        followRepository.save(
-                Follow.builder()
-                        .following(following)
-                        .followed(followed)
-                        .build()
-        );
+        if (followRepository.findByFollowingAndFollowed(
+                following,followed).isEmpty()) {
+                followRepository.save(
+                        Follow.builder()
+                                .following(following)
+                                .followed(followed)
+                                .build());
+        }
     }
 
     @Transactional
     public void unfollow(final String followingId,
                          final String followedId) {
-        User following = getUserByUserId(followingId);
-        User followed = getUserByUserId(followedId);
         followRepository.findByFollowingAndFollowed(
-                following, followed)
+                            getUserByUserId(followingId),
+                            getUserByUserId(followedId))
                 .ifPresent(followRepository::delete);
     }
 
@@ -146,18 +151,6 @@ public class UserService {
                 getUserByUserId(followingId),
                 getUserByUserId(followedId))
                 .isPresent();
-    }
-
-    @Transactional
-    public void validateFollow(User following, User followed) {
-        if (following.getUserId().equals(followed.getUserId())) {
-            throw new GreenFarmException(GreenFarmErrorCode.CANNOT_FOLLOW);
-        }
-        followRepository.findByFollowingAndFollowed(
-                following, followed)
-                .ifPresent(follow -> {
-                    throw new GreenFarmException(GreenFarmErrorCode.CANNOT_FOLLOW);
-                });
     }
 
     @Transactional

@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public class GreenFarmException extends RuntimeException {
-    private GreenFarmErrorCode greenFarmErrorCode;
-    private String detailMessage;
+    private final GreenFarmErrorCode greenFarmErrorCode;
+    private final String detailMessage;
 
     public GreenFarmException(GreenFarmErrorCode greenFarmErrorCode) {
         super(greenFarmErrorCode.getDetailMessage());

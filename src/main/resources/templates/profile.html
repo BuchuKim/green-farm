@@ -48,14 +48,24 @@
                     <a th:href="@{'/'+${userDetail.userId}+'/settings'}" sec:authorize="isAuthenticated()"
                        th:if="${session.user.userId==userDetail.userId}" class="btn btn-outline-success btn-sm ms-auto"
                     >🛠 프로필 수정</a>
-                    <a th:href="@{'/'+${userDetail.userId}+'/follow'}" sec:authorize="isAuthenticated()"
-                       th:unless="${isFollowing || session.user.userId==userDetail.userId}"
-                       class="btn btn-outline-success btn-sm ms-auto"
-                    >팔로우!</a>
-                    <a th:href="@{'/'+${userDetail.userId}+'/unfollow'}" sec:authorize="isAuthenticated()"
-                       th:if="${isFollowing && session.user.userId!=userDetail.userId}"
-                       class="btn btn-outline-success active btn-sm ms-auto"
-                    >언팔로우!</a>
+                    <form class="d-inline ms-auto"
+                          sec:authorize="isAuthenticated()"
+                          th:unless="${userDetail.isFollowing || session.user.userId==userDetail.userId}"
+                          th:action="@{'/'+${userDetail.userId}+'/follow'}"
+                          th:method="post">
+                        <button type="submit"
+                            class="btn btn-outline-success btn-sm ms-auto"
+                        >팔로우!</button>
+                    </form>
+                    <form class="d-inline ms-auto"
+                          sec:authorize="isAuthenticated()"
+                          th:if="${userDetail.isFollowing && session.user.userId!=userDetail.userId}"
+                          th:action="@{'/'+${userDetail.userId}+'/follow'}"
+                          th:method="delete">
+                        <button type="submit"
+                                class="btn btn-outline-success active btn-sm ms-auto"
+                        >언팔로우!</button>
+                    </form>
                 </div>
             </div>
         </div>

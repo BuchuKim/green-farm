@@ -45,7 +45,7 @@
                             <div class="ms-auto">
                                 <form class="d-inline"
                                       sec:authorize="isAuthenticated()"
-                                      th:if="${isLikedByCurrentUser==false}"
+                                      th:if="${farmLog.isLikedByCurrentUser==false}"
                                       th:action="@{${'/farm-log/like/'+farmLog.farmLogId}}"
                                       th:method="post">
                                     <button th:text="${'♡ '+farmLog.likeNum+' 좋아요'}"
@@ -53,7 +53,7 @@
                                 </form>
                                 <form class="d-inline"
                                       sec:authorize="isAuthenticated()"
-                                      th:if="${isLikedByCurrentUser==true}"
+                                      th:if="${farmLog.isLikedByCurrentUser==true}"
                                       th:action="@{${'/farm-log/like/'+farmLog.farmLogId}}"
                                       th:method="delete">
                                     <button th:text="${'♡ '+farmLog.likeNum+' 좋아요 취소'}"

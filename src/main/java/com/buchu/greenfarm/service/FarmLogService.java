@@ -1,10 +1,7 @@
 package com.buchu.greenfarm.service;
 
-import com.buchu.greenfarm.code.FarmLogStatusCode;
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
-import com.buchu.greenfarm.dto.farmLog.EditFarmLog;
-import com.buchu.greenfarm.dto.farmLog.FarmLogDetailDto;
 import com.buchu.greenfarm.dto.farmLog.FarmLogDto;
 import com.buchu.greenfarm.entity.FarmLog;
 import com.buchu.greenfarm.entity.Good;
@@ -38,9 +35,9 @@ public class FarmLogService {
 
     @Transactional
     public List<FarmLogDto> getAllFarmLogs() {
+        // 모든 일기들을 시간 순으로
         return farmLogRepository
-                .getByFarmLogStatusCodeOrderByCreatedAtDesc(
-                        FarmLogStatusCode.PRESENTED).stream()
+                .findAllForIndex().stream()
                 .map(FarmLogDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -53,7 +50,7 @@ public class FarmLogService {
                         getSessionUser()).stream()
                 // 2. following 유저의 farmLog 불러옴
                 .map(follow -> farmLogRepository
-                        .getByAuthor(follow.getFollowed()))
+                        .findByAuthor(follow.getFollowed()))
                 // 3. DTO 변환
                 .map(logs -> logs.stream()
                         .map(FarmLogDto::fromEntity))
@@ -68,44 +65,37 @@ public class FarmLogService {
     }
 
     @Transactional
-    public FarmLogDetailDto getFarmLogDetail(Long id) {
-        return FarmLogDetailDto.fromEntity(getFarmLogById(id));
+    public FarmLogDto getFarmLogDetail(Long id) {
+        FarmLog foundFarmLog = getFarmLogById(id);
+        return FarmLogDto.fromEntity(foundFarmLog)
+                .setIsLikedByCurrentUser(
+                        checkIsLikedByCurrentUser(foundFarmLog));
     }
 
     @Transactional
-    public Boolean checkIsLikedByCurrentUser(final Long id) {
+    public Boolean checkIsLikedByCurrentUser(final FarmLog farmLog) {
         if (!isLoggedIn()) return false;
         return goodRepository.findByLikerAndFarmLog(
                 getSessionUser(),
-                getFarmLogById(id))
+                farmLog)
                 .isPresent();
     }
 
     @Transactional
     public FarmLog getFarmLogById(Long id) {
-        FarmLog foundFarmLog = farmLogRepository.findById(id)
-                .orElseThrow(() -> new GreenFarmException(GreenFarmErrorCode.NO_FARM_LOG_ERROR));
-        if (foundFarmLog.getFarmLogStatusCode().equals(FarmLogStatusCode.DELETED)) {
-            throw new GreenFarmException(GreenFarmErrorCode.DELETED_FARM_LOG_ERROR);
-        }
-        return foundFarmLog;
+        return farmLogRepository.findById(id)
+                .orElseThrow(() -> new GreenFarmException(
+                        GreenFarmErrorCode.NO_FARM_LOG_ERROR));
     }
 
     @Transactional
     public Long getCreatedFarmLogId(CreateFarmLog.Request request) {
-        return farmLogRepository.save(createFarmLogFromRequest(request)).getFarmLogId();
-    }
-
-    @Transactional
-    public CreateFarmLog.Response createFarmLog(CreateFarmLog.Request request) {
-        return CreateFarmLog.Response.fromEntity(
-                farmLogRepository.save(createFarmLogFromRequest(request)));
-    }
-
-    @Transactional
-    public FarmLogDetailDto editFarmLog(Long id, EditFarmLog.Request request) {
-        return FarmLogDetailDto.fromEntity(
-                getUpdatedFarmLog(getFarmLogById(id),request));
+        return farmLogRepository.save(
+                FarmLog.builder()
+                    .logContent(request.getLogContent())
+                    .author(getSessionUser())
+                    .build())
+                .getFarmLogId();
     }
 
     @Transactional
@@ -122,7 +112,8 @@ public class FarmLogService {
         User sessionUser = getSessionUser();
         FarmLog farmLog = getFarmLogById(farmLogId);
         if (goodRepository.findByLikerAndFarmLog(
-                        sessionUser, farmLog).isEmpty()) {
+                        sessionUser, farmLog)
+                .isEmpty()) {
             goodRepository.save(
                     Good.builder()
                             .liker(sessionUser)
@@ -138,17 +129,9 @@ public class FarmLogService {
                 .ifPresent(goodRepository::delete);
     }
 
-    public FarmLog getUpdatedFarmLog(FarmLog farmLog, EditFarmLog.Request request) {
-        farmLog.setLogContent(request.getLogContent());
-        return farmLog;
-    }
-
-
     private FarmLog createFarmLogFromRequest(CreateFarmLog.Request request) {
         return FarmLog.builder()
                 .logContent(request.getLogContent())
-                .commentNum(0)
-                .farmLogStatusCode(FarmLogStatusCode.PRESENTED)
                 .author(getSessionUser())
                 .build();
     }
@@ -172,8 +155,7 @@ public class FarmLogService {
         if (currentUser==null) {
             throw new GreenFarmException(GreenFarmErrorCode.NEED_LOGIN);
         }
-        String email = currentUser.getEmail();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new GreenFarmException(GreenFarmErrorCode.NO_USER_ERROR));
     }
 

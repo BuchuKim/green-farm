@@ -1,6 +1,7 @@
 package com.buchu.greenfarm.dto.farmLog;
 
 import com.buchu.greenfarm.entity.FarmLog;
+import com.buchu.greenfarm.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,10 +10,8 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class FarmLogDto {
-    // home(index)에서 보이는 farm log
 
     private String logContent;
     private int likeNum;
@@ -20,16 +19,22 @@ public class FarmLogDto {
     private String authorName;
     private String authorId;
     private String createdAt;
+    private Boolean isLikedByCurrentUser;
 
-    public static FarmLogDto fromEntity(FarmLog farmLog) {
+    public static FarmLogDto fromEntity(final FarmLog farmLog) {
         return FarmLogDto.builder()
                 .logContent(farmLog.getLogContent())
                 .farmLogId(farmLog.getFarmLogId())
                 .authorId(farmLog.getAuthor().getUserId())
                 .authorName(farmLog.getAuthor().getName())
                 .createdAt(createdAtString(farmLog.getCreatedAt()))
-                .likeNum(farmLog.getLikeNum())
+                .likeNum(farmLog.getLikers().size())
                 .build();
+    }
+
+    public FarmLogDto setIsLikedByCurrentUser(Boolean isLikedByCurrentUser) {
+        this.isLikedByCurrentUser = isLikedByCurrentUser;
+        return this;
     }
 
     private static String createdAtString(LocalDateTime createdAt) {

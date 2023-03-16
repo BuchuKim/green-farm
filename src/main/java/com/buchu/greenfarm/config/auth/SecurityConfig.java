@@ -17,15 +17,14 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
                 .headers().frameOptions().disable()
                 .and().authorizeHttpRequests()
-                    .requestMatchers(HttpMethod.POST).authenticated()
-                    .requestMatchers(HttpMethod.PUT).authenticated()
-                    .requestMatchers(HttpMethod.DELETE).authenticated()
+                    .requestMatchers(HttpMethod.POST,"/**").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/**").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/**").authenticated()
                     .requestMatchers("/u/register").hasRole("GUEST")
                     .requestMatchers("/*/follow").hasRole("USER")
-                    .requestMatchers("/*/unfollow").hasRole("USER")
                     .anyRequest().permitAll()
                 .and().logout()
                     .logoutUrl("/u/logout")

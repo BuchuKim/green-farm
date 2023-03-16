@@ -1,12 +1,11 @@
 package com.buchu.greenfarm.controller;
 
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
-import com.buchu.greenfarm.dto.farmLog.EditFarmLog;
-import com.buchu.greenfarm.dto.farmLog.FarmLogDetailDto;
 import com.buchu.greenfarm.dto.farmLog.FarmLogDto;
+import com.buchu.greenfarm.exception.GreenFarmErrorCode;
+import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.service.FarmLogService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -15,9 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -52,25 +51,20 @@ public class FarmLogController {
                 fixBackURI(request.getHeader("referer")));
         model.addAttribute("farmLog",
                 farmLogService.getFarmLogDetail(id));
-        model.addAttribute("isLikedByCurrentUser",
-                farmLogService.checkIsLikedByCurrentUser(id));
         return "showFarmLog.html";
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createFarmLogUrlEncoded(
-            @Valid @ModelAttribute("createFarmLog") final CreateFarmLog.Request request) {
-        log.info("creating farm log by x-www-form-urlencoded request: {}",request);
-        return "redirect:/farm-log/" + String.valueOf(farmLogService.getCreatedFarmLogId(request));
-    }
-
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FarmLogDetailDto editFarmLog(
-            @PathVariable Long id,
-            @Valid @RequestBody final EditFarmLog.Request request
-    ) {
-        log.info("editing farm log by JSON request: {}",request);
-        return farmLogService.editFarmLog(id, request);
+    public String createFarmLog(
+            @Valid @ModelAttribute("createFarmLog")
+            final CreateFarmLog.Request request,
+            BindingResult result
+            ) {
+        if (result.hasErrors()) {
+            throw new GreenFarmException(GreenFarmErrorCode.INVALID_DATA);
+        }
+        return "redirect:/farm-log/" + String.valueOf(
+                farmLogService.getCreatedFarmLogId(request));
     }
 
     @DeleteMapping(value = "/{id}")
@@ -91,9 +85,7 @@ public class FarmLogController {
 
     @DeleteMapping("/like/{farmLogId}")
     public String unlikeFarmLog(@PathVariable("farmLogId")
-                                    final Long farmLogId,
-                                HttpServletRequest request,
-                                HttpServletResponse response) {
+                                    final Long farmLogId) {
         farmLogService.unlikeFarmLog(farmLogId);
         return "redirect:/farm-log/"+farmLogId;
     }

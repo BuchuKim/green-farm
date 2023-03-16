@@ -2,6 +2,7 @@ package com.buchu.greenfarm.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -14,11 +15,13 @@ public class Follow extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @BatchSize(size = 1)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following")
     private User following;
 
-    @ManyToOne
+    @BatchSize(size = 1)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed")
     private User followed;
 }

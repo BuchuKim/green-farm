@@ -7,10 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GreenFarmErrorCode {
     NO_FARM_LOG_ERROR("해당하는 농장 일기가 존재하지 않습니다."),
-    DELETED_FARM_LOG_ERROR("해당 농장 일기는 삭제되었습니다."),
+    NO_USER_ERROR("해당하는 유저가 존재하지 않습니다."),
     INVALID_REQUEST("잘못된 요청입니다."),
     DUPLICATED_USER_ID("중복된 유저 아이디입니다."),
-    NO_USER_ERROR("해당하는 유저가 존재하지 않습니다."),
     INTERNAL_SERVER_ERROR("서버에 오류가 발생했습니다."),
     INVALID_USER_ID_ERROR("적절한 아이디가 아닙니다."),
     INVALID_DATA("적절한 데이터가 아닙니다."),

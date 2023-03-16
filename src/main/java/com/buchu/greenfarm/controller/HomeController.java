@@ -26,7 +26,7 @@ public class HomeController {
                              @RequestParam(value = "following",
                                      required = false,
                                      defaultValue = "false")
-                             Boolean following,
+                             final Boolean following,
                              Authentication authentication) {
         model.addAttribute("createFarmLog", new CreateFarmLog.Request());
         model.addAttribute("following", following);

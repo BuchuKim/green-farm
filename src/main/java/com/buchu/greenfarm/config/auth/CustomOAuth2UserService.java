@@ -37,10 +37,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // 1. user request 로부터 user load
-        OAuth2UserService delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+        OAuth2User oAuth2User =
+                new DefaultOAuth2UserService().loadUser(userRequest);
 
         // 2. 구분
         // registrationId : 현재 어떤 OAuth service 이용중인가? (네이버? 구글?)
@@ -69,6 +70,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return userRepository.save(user);
     }
 
+    @Transactional
     public void updateRole(String role) {
         DefaultOAuth2User currentUser = (DefaultOAuth2User)
                 SecurityContextHolder.getContext()
