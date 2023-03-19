@@ -37,18 +37,17 @@ public class FarmLogController {
             HttpServletRequest request,
             @PathVariable Long id,
             Model model) {
-        if (hasSameURI(request.getRequestURI(),
+        if (request.getHeader("referer") == null) {
+            model.addAttribute("backURI","/");
+        } else if (hasSameURI(request.getRequestURI(),
                 request.getHeader("referer"))) {
-            model.addAttribute("backURI",
-                    httpSession.getAttribute("backURI"));
+            model.addAttribute("backURI", httpSession.getAttribute("backURI"));
         } else {
             httpSession.setAttribute("backURI",
                     request.getHeader("referer"));
             model.addAttribute("backURI",
                     request.getHeader("referer"));
         }
-        model.addAttribute("backURI",
-                fixBackURI(request.getHeader("referer")));
         model.addAttribute("farmLog",
                 farmLogService.getFarmLogDetail(id));
         return "showFarmLog.html";
@@ -90,19 +89,11 @@ public class FarmLogController {
         return "redirect:/farm-log/"+farmLogId;
     }
 
-    private String fixBackURI(final String backURI) {
-        String existingURI = (String)
-                httpSession.getAttribute("backURI");
-        if (existingURI == null) {
-            httpSession.setAttribute("backURI", backURI);
-            return backURI;
-        } else {
-            return existingURI;
-        }
-    }
-
     private Boolean hasSameURI(@NonNull String request,
-                               @NonNull String referer) {
+                               String referer) {
+        if (referer==null) {
+            return false;
+        }
         return referer.endsWith(request);
     }
 }

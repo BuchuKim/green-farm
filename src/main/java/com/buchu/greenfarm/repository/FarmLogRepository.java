@@ -22,7 +22,7 @@ public interface FarmLogRepository extends JpaRepository<FarmLog,Long> {
 
     @Query("select f " +
             "from FarmLog f " +
-            "join fetch f.likers " +
+            "left join fetch f.likers " +
             "where f.author = :author " +
             "order by f.createdAt desc")
     List<FarmLog> findByAuthorOrderByCreatedAtDesc(@Param("author") User author);

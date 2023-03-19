@@ -45,7 +45,6 @@ public class UserService {
                         .collect(Collectors.toList()) :
                 // 일반 홈이라면 -> findByAuthor (현재 페이지 유저 = 일기 작성한 사람)
                 farmLogRepository.findByAuthorOrderByCreatedAtDesc(foundUser);
-
         return UserDetailDto.fromEntity(foundUser,foundFarmLogs)
                 .setFollowNums(followRepository.countByFollowing(foundUser),
                         followRepository.countByFollowed(foundUser))
