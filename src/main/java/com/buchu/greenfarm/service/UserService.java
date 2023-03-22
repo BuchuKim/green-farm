@@ -39,11 +39,7 @@ public class UserService {
         User foundUser = getUserByUserId(userId);
 
         List<FarmLog> foundFarmLogs = isLike ?
-                // 좋아요 누른 일기 페이지라면? -> findByLiker (현재 페이지 유저 = 좋아요 누른 사람)
-                goodRepository.findByLikerOrderByCreatedAtDesc(foundUser).stream()
-                        .map(Good::getFarmLog)
-                        .collect(Collectors.toList()) :
-                // 일반 홈이라면 -> findByAuthor (현재 페이지 유저 = 일기 작성한 사람)
+                farmLogRepository.findByLikerUsingQueryDsl(foundUser) :
                 farmLogRepository.findByAuthorOrderByCreatedAtDesc(foundUser);
         return UserDetailDto.fromEntity(foundUser,foundFarmLogs)
                 .setFollowNums(followRepository.countByFollowing(foundUser),

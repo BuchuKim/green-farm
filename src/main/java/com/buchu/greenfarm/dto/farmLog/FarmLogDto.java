@@ -28,7 +28,7 @@ public class FarmLogDto {
                 .authorId(farmLog.getAuthor().getUserId())
                 .authorName(farmLog.getAuthor().getName())
                 .createdAt(createdAtString(farmLog.getCreatedAt()))
-                .likeNum(farmLog.getLikers().size())
+                .likeNum(farmLog.getLikeNum())
                 .build();
     }
 

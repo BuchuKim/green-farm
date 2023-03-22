@@ -42,26 +42,11 @@ public class FarmLogService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional public List<FarmLogDto> getFollowingFarmLogs() {
-        List<FarmLogDto> farmLogs = new ArrayList<>();
+    @Transactional
+    public List<FarmLogDto> getFollowingFarmLogs() {
 
-        followRepository.findByFollowing(
-                        // 1. following 목록의 user 불러옴
-                        getSessionUser()).stream()
-                // 2. following 유저의 farmLog 불러옴
-                .map(follow -> farmLogRepository
-                        .findByAuthor(follow.getFollowed()))
-                // 3. DTO 변환
-                .map(logs -> logs.stream()
-                        .map(FarmLogDto::fromEntity))
-                // 4. 결과 합침
-                .forEach(farmLogDtos -> farmLogDtos
-                        .forEach(farmLogs::add));
-
-        // 5. 최신 순으로 정렬 후 Return
-        farmLogs.sort(Comparator.comparing(FarmLogDto::getCreatedAt));
-
-        return farmLogs;
+        return farmLogRepository.findFollowingFarmLogsUsingQueryDsl(getSessionUser())
+                .stream().map(FarmLogDto::fromEntity).collect(Collectors.toList());
     }
 
     @Transactional

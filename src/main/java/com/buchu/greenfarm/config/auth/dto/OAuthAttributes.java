@@ -72,7 +72,7 @@ public class OAuthAttributes {
 
     public User toEntity() {
         return User.builder()
-                .name(this.name)
+                .name(this.name.length() <= 15 ? this.name : this.name.substring(0,15))
                 .email(this.email)
                 .userId("_")
                 .oAuth2Id(this.id)
@@ -80,4 +80,5 @@ public class OAuthAttributes {
                 .role(Role.GUEST)
                 .build();
     }
+
 }

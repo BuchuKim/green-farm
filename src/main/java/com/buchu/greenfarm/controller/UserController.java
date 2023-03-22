@@ -3,11 +3,15 @@ package com.buchu.greenfarm.controller;
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
 import com.buchu.greenfarm.dto.user.UserProfileDto;
 import com.buchu.greenfarm.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -53,10 +57,15 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable("userId") final String userId) {
-        log.info("user id - {} deleted.",userId);
+    public String deleteUser(HttpServletRequest request,
+                             HttpServletResponse response,
+                             @PathVariable("userId") final String userId) {
         userService.deleteUser(userId);
-        return "redirect:/u/logout";
+        new SecurityContextLogoutHandler().logout(
+                request,
+                response,
+                SecurityContextHolder.getContext().getAuthentication());
+        return "redirect:/";
     }
 
     @PostMapping("/{userId}/follow")

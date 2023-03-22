@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,7 +35,7 @@ public class FarmLog extends BaseEntity {
     @OneToMany(mappedBy = "farmLog",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    private List<Good> likers;
+    private List<Good> likers = new ArrayList<>();
 
     public int getLikeNum() {
         return this.likers.size();
