@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${userDetail.name + ' 님의 농장'}"></title>
+    <title th:text="${currentPageUser.name + ' 님의 농장'}"></title>
     <link rel="shortcut icon" href="/assets/icons8-seedling-32.png">
     <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,37 +21,37 @@
     <div class="row justify-content-center mb-3">
         <div class="col-10 col-lg-5 d-flex mb-1">
             <div class="me-auto">
-                <h3 class="fw-bold" th:text="${userDetail.name}"></h3>
-                <p class="text-muted" th:text="${'@' + userDetail.userId}"></p>
+                <h3 class="fw-bold" th:text="${currentPageUser.name}"></h3>
+                <p class="text-muted" th:text="${'@' + currentPageUser.userId}"></p>
                 <div class="d-flex">
                     <div class="me-2">
                         <small>
-                            <a th:href="${'/'+userDetail.userId+'/following'}"
+                            <a th:href="${'/'+currentPageUser.userId+'/following'}"
                                class="fw-bold text-decoration-none text-black"
-                               th:text="${userDetail.followingNum+' '}"></a>
+                               th:text="${currentPageUser.followingNum+' '}"></a>
                             팔로잉
                         </small>
                     </div>
                     <div>
                         <small>
-                            <a th:href="${'/'+userDetail.userId+'/follower'}"
+                            <a th:href="${'/'+currentPageUser.userId+'/follower'}"
                                 class="fw-bold text-decoration-none text-black"
-                                th:text="${userDetail.followerNum+' '}"></a>
+                                th:text="${currentPageUser.followerNum+' '}"></a>
                             팔로워
                         </small>
                     </div>
                 </div>
             </div>
             <div>
-                <p th:text="${'🗓 ' +userDetail.createdAt + ' 가입'}"></p>
+                <p th:text="${'🗓 ' +currentPageUser.createdAt + ' 가입'}"></p>
                 <div class="d-flex">
-                    <a th:href="@{'/'+${userDetail.userId}+'/settings'}" sec:authorize="isAuthenticated()"
-                       th:if="${session.user.userId==userDetail.userId}" class="btn btn-outline-success btn-sm ms-auto"
+                    <a th:href="@{'/'+${currentPageUser.userId}+'/settings'}" sec:authorize="isAuthenticated()"
+                       th:if="${session.user.userId==currentPageUser.userId}" class="btn btn-outline-success btn-sm ms-auto"
                     >🛠 프로필 수정</a>
                     <form class="d-inline ms-auto"
                           sec:authorize="isAuthenticated()"
-                          th:unless="${userDetail.isFollowing || session.user.userId==userDetail.userId}"
-                          th:action="@{'/'+${userDetail.userId}+'/follow'}"
+                          th:unless="${currentPageUser.isFollowing || session.user.userId==currentPageUser.userId}"
+                          th:action="@{'/'+${currentPageUser.userId}+'/follow'}"
                           th:method="post">
                         <button type="submit"
                             class="btn btn-outline-success btn-sm ms-auto"
@@ -59,8 +59,8 @@
                     </form>
                     <form class="d-inline ms-auto"
                           sec:authorize="isAuthenticated()"
-                          th:if="${userDetail.isFollowing && session.user.userId!=userDetail.userId}"
-                          th:action="@{'/'+${userDetail.userId}+'/follow'}"
+                          th:if="${currentPageUser.isFollowing && session.user.userId!=currentPageUser.userId}"
+                          th:action="@{'/'+${currentPageUser.userId}+'/follow'}"
                           th:method="delete">
                         <button type="submit"
                                 class="btn btn-outline-success active btn-sm ms-auto"
@@ -72,7 +72,7 @@
     </div>
     <div class="row justify-content-center">
             <div class="col-10 col-lg-5 d-flex mb-3">
-                <p th:text="${userDetail.bio}"></p>
+                <p th:text="${currentPageUser.bio}"></p>
             </div>
     </div>
     <div class="row justify-content-center">
@@ -81,19 +81,19 @@
                 <li class="nav-item">
                     <a class="nav-link text-success-emphasis" aria-current="page"
                        th:classappend="${isLike == false} ? 'active' : ''"
-                       th:href="@{${'/'+userDetail.userId}}">농장 일기</a>
+                       th:href="@{${'/'+currentPageUser.userId}}">농장 일기</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-success-emphasis"
                        th:classappend="${isLike == true} ? 'active' : ''"
-                       th:href="@{${'/'+userDetail.userId+'?like=true'}}">좋아요</a>
+                       th:href="@{${'/'+currentPageUser.userId+'?like=true'}}">좋아요</a>
                 </li>
             </ul>
-            <div th:if="${#lists.isEmpty(userDetail.farmLogs)}"
+            <div th:if="${#lists.isEmpty(farmLogs)}"
                  class="p-4">
                 <p class="text-muted text-center">농장일기가 존재하지 않습니다!</p>
             </div>
-            <div th:each="farmLog: ${userDetail.farmLogs}" class="card mb-3">
+            <div th:each="farmLog: ${farmLogs}" class="card mb-3">
                 <div class="card-header">
                     <div class="d-flex p-1">
                         <div class="me-auto fw-bold">
@@ -114,6 +114,30 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="d-flex justify-content-center pt-3">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link"
+                               th:href="@{'/'+${currentPageUser.userId}(page=${pageNum-1},like=${isLike})}"
+                               th:classappend="${pageNum <= 1} ? 'disabled' : ''"
+                               aria-label="Previous"
+                            >
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link"
+                               th:href="@{'/'+${currentPageUser.userId}(page=${pageNum+1},like=${isLike})}"
+                               th:classappend="${hasNext} ? '' : 'disabled'"
+                               aria-label="Next"
+                            >
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

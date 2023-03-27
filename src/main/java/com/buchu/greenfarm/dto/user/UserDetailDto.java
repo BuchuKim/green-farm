@@ -23,6 +23,7 @@ public class UserDetailDto {
     private String bio;
     private int followerNum;
     private int followingNum;
+    @Builder.Default
     private Boolean isFollowing = false;
     private List<FarmLogDto> farmLogs;
 

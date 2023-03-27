@@ -2,17 +2,23 @@ package com.buchu.greenfarm.controller;
 
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
+import com.buchu.greenfarm.entity.FarmLog;
 import com.buchu.greenfarm.exception.GreenFarmErrorCode;
 import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.service.FarmLogService;
+import com.buchu.greenfarm.util.PageRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -23,17 +29,17 @@ public class HomeController {
 
     @GetMapping("/")
     public String getHome(Model model,
-                             @RequestParam(value = "following",
+                          @RequestParam(value = "following",
                                      required = false,
                                      defaultValue = "false")
                              final Boolean following,
-                             Authentication authentication) {
+                          final PageRequest pageRequest) {
         model.addAttribute("createFarmLog", new CreateFarmLog.Request());
+        Map<String, Object> data = farmLogService.getAllFarmLogsPage(pageRequest.of(),following);
+        model.addAttribute("pageNum", pageRequest.getPage());
         model.addAttribute("following", following);
-
-        model.addAttribute("farmLogs",
-                (following) ? farmLogService.getFollowingFarmLogs()
-                        : farmLogService.getAllFarmLogs());
+        model.addAttribute("hasNext", data.get("hasNext"));
+        model.addAttribute("farmLogs", data.get("farmLogs"));
         return "index.html";
     }
 
@@ -41,14 +47,4 @@ public class HomeController {
     private String getInfoPage() {
         return "info.html";
     }
-
-    private SessionUser getSessionUser() {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser != null) {
-            return sessionUser;
-        } else {
-            throw new GreenFarmException(GreenFarmErrorCode.NO_AVAILABLE_FOLLOWING);
-        }
-    }
-
 }
