@@ -1,7 +1,6 @@
 package com.buchu.greenfarm.controller;
 
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
-import com.buchu.greenfarm.dto.farmLog.FarmLogDto;
 import com.buchu.greenfarm.exception.GreenFarmErrorCode;
 import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.service.FarmLogService;
@@ -17,8 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("farm-log")
 @RequiredArgsConstructor
@@ -26,11 +23,6 @@ import java.util.List;
 public class FarmLogController {
     private final FarmLogService farmLogService;
     private final HttpSession httpSession;
-
-    @GetMapping
-    public List<FarmLogDto> getAllLogs() {
-        return farmLogService.getAllFarmLogs();
-    }
 
     @GetMapping("/{id}")
     public String showFarmLog(

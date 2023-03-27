@@ -1,8 +1,12 @@
 package com.buchu.greenfarm.controller;
 
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
+import com.buchu.greenfarm.dto.user.UserDto;
 import com.buchu.greenfarm.dto.user.UserProfileDto;
+import com.buchu.greenfarm.entity.User;
+import com.buchu.greenfarm.repository.FarmLogRepository;
 import com.buchu.greenfarm.service.UserService;
+import com.buchu.greenfarm.util.PageRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,11 +43,19 @@ public class UserController {
                                   required = false,
                                   defaultValue = "false")
                                     final Boolean isLike,
-                          Authentication authentication,
+                          final PageRequest pageRequest,
                           Model model) {
-        model.addAttribute("userDetail",
-                userService.getUserDetailDto(userId, isLike));
+        User currentPageUser = userService.getUserByUserId(userId);
+        UserDto currentPageUserDto = userService.getUserDetail(currentPageUser);
+        Map<String, Object> data = userService.getFarmLogPagesOfCurrentPageUser(
+                currentPageUser, isLike, pageRequest.of());
+
+        model.addAttribute("pageNum",pageRequest.getPage());
+        model.addAttribute("hasNext",data.get("hasNext"));
+        model.addAttribute("currentPageUser", currentPageUserDto);
         model.addAttribute("isLike",isLike);
+        model.addAttribute("farmLogs", data.get("farmLogs"));
+
         return "profile.html";
     }
 

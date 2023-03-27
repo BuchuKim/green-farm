@@ -1,26 +1,30 @@
 package com.buchu.greenfarm.service;
 
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
+import com.buchu.greenfarm.dto.farmLog.FarmLogDto;
 import com.buchu.greenfarm.dto.user.DeleteUserDto;
 import com.buchu.greenfarm.dto.user.UserDetailDto;
+import com.buchu.greenfarm.dto.user.UserDto;
 import com.buchu.greenfarm.dto.user.UserProfileDto;
 import com.buchu.greenfarm.entity.FarmLog;
 import com.buchu.greenfarm.entity.Follow;
-import com.buchu.greenfarm.entity.Good;
 import com.buchu.greenfarm.entity.User;
 import com.buchu.greenfarm.exception.GreenFarmErrorCode;
 import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.repository.FarmLogRepository;
 import com.buchu.greenfarm.repository.FollowRepository;
-import com.buchu.greenfarm.repository.GoodRepository;
 import com.buchu.greenfarm.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,29 +35,44 @@ public class UserService {
     private final UserRepository userRepository;
     private final FarmLogRepository farmLogRepository;
     private final FollowRepository followRepository;
-    private final GoodRepository goodRepository;
 
     @Transactional
-    public UserDetailDto getUserDetailDto(final String userId,
-                                          final Boolean isLike) {
-        User foundUser = getUserByUserId(userId);
+    public UserDto getUserDetail(final User currentPageUser) {
+        return UserDto.fromEntity(currentPageUser,
+                followRepository.countByFollowing(currentPageUser),
+                followRepository.countByFollowed(currentPageUser),
+                getSessionUser() != null
+                        && followRepository.findByFollowingAndFollowed(
+                                getUserByUserId(getSessionUser().getUserId()),
+                                currentPageUser)
+                        .isPresent());
+    }
 
-        List<FarmLog> foundFarmLogs = isLike ?
-                farmLogRepository.findByLikerUsingQueryDsl(foundUser) :
-                farmLogRepository.findByAuthorOrderByCreatedAtDesc(foundUser);
-        return UserDetailDto.fromEntity(foundUser,foundFarmLogs)
-                .setFollowNums(followRepository.countByFollowing(foundUser),
-                        followRepository.countByFollowed(foundUser))
-                .setIsFollowing(
-                        getSessionUser() != null &&
-                                followRepository.findByFollowingAndFollowed(
-                                    getUserByUserId(getSessionUser().getUserId()),
-                                                foundUser).isPresent());
+    @Transactional
+    public Map<String, Object> getFarmLogPagesOfCurrentPageUser(
+            final User currentPageUser,
+            final Boolean isLike,
+            final Pageable pageable) {
+        PageImpl<FarmLog> farmLogs = isLike
+                ? farmLogRepository.findByLikerQueryDslPaging(
+                        currentPageUser, pageable)
+                : farmLogRepository.findByAuthorQueryDslPaging(
+                        currentPageUser, pageable);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("hasNext",farmLogs.hasNext());
+        data.put("farmLogs",
+                farmLogs.stream()
+                .map(FarmLogDto::fromEntity)
+                .collect(Collectors.toList()));
+
+        return data;
     }
 
     @Transactional
     public UserProfileDto getUserProfileDto(final String userId) {
-        return UserProfileDto.fromEntity(getUserByUserId(userId));
+        return UserProfileDto
+                .fromEntity(getUserByUserId(userId));
     }
 
     @Transactional
@@ -118,9 +137,9 @@ public class UserService {
     }
 
     @Transactional
-    protected User getUserByUserId(String userId) {
+    public User getUserByUserId(String userId) {
         return userRepository.findByUserId(userId)
-                .orElseThrow(() ->new GreenFarmException(
+                .orElseThrow(() -> new GreenFarmException(
                         GreenFarmErrorCode.NO_USER_ERROR));
     }
 
@@ -137,15 +156,6 @@ public class UserService {
                     throw new GreenFarmException(
                             GreenFarmErrorCode.DUPLICATED_USER_ID);
                 });
-    }
-
-    @Transactional
-    public Boolean isFollowing(final String followingId,
-                               final String followedId) {
-        return followRepository.findByFollowingAndFollowed(
-                getUserByUserId(followingId),
-                getUserByUserId(followedId))
-                .isPresent();
     }
 
     @Transactional

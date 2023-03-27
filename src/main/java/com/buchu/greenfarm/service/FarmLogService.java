@@ -16,11 +16,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,23 +30,18 @@ public class FarmLogService {
     private final FarmLogRepository farmLogRepository;
     private final UserRepository userRepository;
     private final GoodRepository goodRepository;
-    private final FollowRepository followRepository;
     private final HttpSession httpSession;
 
     @Transactional
-    public List<FarmLogDto> getAllFarmLogs() {
-        // 모든 일기들을 시간 순으로
-        return farmLogRepository
-                .findAllForIndex().stream()
-                .map(FarmLogDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public List<FarmLogDto> getFollowingFarmLogs() {
-
-        return farmLogRepository.findFollowingFarmLogsUsingQueryDsl(getSessionUser())
-                .stream().map(FarmLogDto::fromEntity).collect(Collectors.toList());
+    public Map<String, Object> getAllFarmLogsPage(Pageable pageable,
+                                                  Boolean following) {
+        PageImpl<FarmLog> farmLogs = following
+                ? farmLogRepository.findFollowingFarmLogsQueryDslPaging(pageable, getSessionUser())
+                : farmLogRepository.findAllFarmLogsQueryDslPaging(pageable);
+        Map<String, Object> returnObj = new HashMap<>();
+        returnObj.put("hasNext",farmLogs.hasNext());
+        returnObj.put("farmLogs",farmLogs.stream().map(FarmLogDto::fromEntity).collect(Collectors.toList()));
+        return returnObj;
     }
 
     @Transactional
@@ -112,13 +107,6 @@ public class FarmLogService {
         goodRepository.findByLikerAndFarmLog(
                 getSessionUser(), getFarmLogById(farmLogId))
                 .ifPresent(goodRepository::delete);
-    }
-
-    private FarmLog createFarmLogFromRequest(CreateFarmLog.Request request) {
-        return FarmLog.builder()
-                .logContent(request.getLogContent())
-                .author(getSessionUser())
-                .build();
     }
 
     private Boolean isLoggedIn() {
