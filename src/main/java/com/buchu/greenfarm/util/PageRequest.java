@@ -5,7 +5,7 @@ public class PageRequest {
 
     public void setPage(String page) {
         try {
-            this.page = Integer.parseInt(page);
+            this.page = Math.min(1,Integer.parseInt(page));
         } catch (NumberFormatException e) {
             this.page = 1;
         }

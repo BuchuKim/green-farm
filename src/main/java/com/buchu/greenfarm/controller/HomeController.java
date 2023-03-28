@@ -1,18 +1,11 @@
 package com.buchu.greenfarm.controller;
 
-import com.buchu.greenfarm.config.auth.dto.SessionUser;
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
-import com.buchu.greenfarm.entity.FarmLog;
-import com.buchu.greenfarm.exception.GreenFarmErrorCode;
-import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.service.FarmLogService;
 import com.buchu.greenfarm.util.PageRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +18,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HomeController {
     private final FarmLogService farmLogService;
-    private final HttpSession httpSession;
 
     @GetMapping("/")
     public String getHome(Model model,
