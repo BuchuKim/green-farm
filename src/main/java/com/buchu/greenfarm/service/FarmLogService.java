@@ -9,7 +9,6 @@ import com.buchu.greenfarm.entity.User;
 import com.buchu.greenfarm.exception.GreenFarmErrorCode;
 import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.repository.FarmLogRepository;
-import com.buchu.greenfarm.repository.FollowRepository;
 import com.buchu.greenfarm.repository.GoodRepository;
 import com.buchu.greenfarm.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -20,7 +19,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
