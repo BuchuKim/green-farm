@@ -5,6 +5,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class FarmLogCustomRepositoryImpl implements FarmLogCustomRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -140,5 +142,34 @@ public class FarmLogCustomRepositoryImpl implements FarmLogCustomRepository{
                 .fetchOne();
 
         return new PageImpl<>(farmLogs, pageable, count == null ? 0 : count);
+    }
+
+    @Override
+    public PageImpl<FarmLog> findByKeyWordQueryDslPaging(final String keyword,
+                                                         final Pageable pageable) {
+        QFarmLog farmLog = QFarmLog.farmLog;
+
+        JPAQuery<Long> searchedLogs = jpaQueryFactory
+                .select(farmLog.farmLogId).from(farmLog)
+                .where(farmLog.logContent
+                        .contains(keyword))
+                .orderBy(farmLog.createdAt.desc());
+
+        long count = searchedLogs.stream().count();
+
+        List<Long> pagedIds = searchedLogs
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<FarmLog> farmLogs = jpaQueryFactory
+                .selectFrom(farmLog)
+                .leftJoin(farmLog.likers).fetchJoin()
+                .where(farmLog.farmLogId.in(
+                        pagedIds))
+                .orderBy(farmLog.createdAt.desc())
+                .fetch();
+
+        return new PageImpl<>(farmLogs, pageable, count);
     }
 }

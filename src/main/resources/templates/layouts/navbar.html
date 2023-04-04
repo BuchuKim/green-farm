@@ -29,9 +29,9 @@
                 </ul>
             </li>
         </ul>
-        <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search(준비중)" aria-label="Search" disabled>
-            <button class="btn btn-outline-success" type="submit">Search</button>
+        <form class="d-flex" role="search" th:action="@{/farm-log/search}" th:method="get">
+            <input class="form-control me-2" type="search" placeholder="키워드" aria-label="Search" th:name="keyword">
+            <button class="btn btn-outline-success" type="submit">search</button>
         </form>
     </div>
     </div>

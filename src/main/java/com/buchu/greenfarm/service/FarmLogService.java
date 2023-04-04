@@ -15,11 +15,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -107,6 +109,13 @@ public class FarmLogService {
         goodRepository.findByLikerAndFarmLog(
                 getSessionUser(), getFarmLogById(farmLogId))
                 .ifPresent(goodRepository::delete);
+    }
+
+    @Transactional
+    public Page<FarmLog> searchFarmLog(final String keyword,
+                              final Pageable pageable) {
+        return farmLogRepository
+                .findByKeyWordQueryDslPaging(keyword,pageable);
     }
 
     private Boolean isLoggedIn() {
