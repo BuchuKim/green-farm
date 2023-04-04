@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>부추 농장 - 오류</title>
     <link rel="shortcut icon" href="/assets/icons8-seedling-32.png">
+    <link rel="icon" href="data:,">
     <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +27,8 @@
     </div>
     <div class="row justify-content-center align-items-center mt-4">
         <div class="col-9 col-lg-4">
-            <h3 class="text-center" th:text="${status + ' ' + error}"></h3>
+            <h3 class="text-center" th:text="${status + ' ' + error}"
+                style="word-break : break-all;"></h3>
             <div class="mt-4 d-flex justify-content-center">
                 <a class="btn btn-outline-success"
                    href="/">홈으로</a>

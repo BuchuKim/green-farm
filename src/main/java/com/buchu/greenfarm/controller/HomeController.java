@@ -3,13 +3,13 @@ package com.buchu.greenfarm.controller;
 import com.buchu.greenfarm.dto.farmLog.CreateFarmLog;
 import com.buchu.greenfarm.service.FarmLogService;
 import com.buchu.greenfarm.util.PageRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
@@ -36,7 +36,12 @@ public class HomeController {
     }
 
     @GetMapping("/i")
-    private String getInfoPage() {
+    public String getInfoPage() {
         return "info.html";
     }
+
+
+    @GetMapping("/favicon.ico")
+    @ResponseBody
+    public void returnNoFavicon() {}
 }

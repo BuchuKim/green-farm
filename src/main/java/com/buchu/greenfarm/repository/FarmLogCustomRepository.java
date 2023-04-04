@@ -15,4 +15,6 @@ public interface FarmLogCustomRepository {
     PageImpl<FarmLog> findByAuthorQueryDslPaging(User author, Pageable pageable);
 
     PageImpl<FarmLog> findByLikerQueryDslPaging(User liker, Pageable pageable);
+
+    PageImpl<FarmLog> findByKeyWordQueryDslPaging(String keyword, Pageable pageable);
 }

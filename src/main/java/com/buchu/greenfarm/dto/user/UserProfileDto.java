@@ -1,6 +1,8 @@
 package com.buchu.greenfarm.dto.user;
 
 import com.buchu.greenfarm.entity.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Builder
