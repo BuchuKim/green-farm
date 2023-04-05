@@ -78,7 +78,7 @@ public class UserService {
     @Transactional
     public void editUser(final String userId,
                          final UserProfileDto userProfileDto) {
-        validateCurrentUser(userId);
+        validateCurrentUser(userProfileDto.getEmail());
         validateUserId(userProfileDto.getUserId());
         httpSession.setAttribute(
                 "user",new SessionUser(
@@ -86,9 +86,10 @@ public class UserService {
                                 .editByDto(userProfileDto)));
     }
 
-    private void validateCurrentUser(String beingEditedUserId) {
-        if (!getSessionUser().getUserId()
-                .equals(beingEditedUserId)) {
+    private void validateCurrentUser(String beingEditedUserEmail) {
+        // validate if current user is equal to currently edited user
+        if (!getSessionUser().getEmail()
+                .equals(beingEditedUserEmail)) {
             throw new GreenFarmException(
                     GreenFarmErrorCode.INVALID_REQUEST_USER);
         }
@@ -147,6 +148,7 @@ public class UserService {
     private void validateUserId(String userId) {
         if (getSessionUser()
                 .getUserId().equals(userId)) {
+            // no validation if id is not edited
             return;
         }
 
@@ -166,8 +168,15 @@ public class UserService {
 
     @Transactional
     public void deleteUser(final String userId) {
-        validateCurrentUser(userId);
+        validateDeletedUser(userId);
         userRepository.delete(getUserByUserId(userId));
+    }
+
+    @Transactional
+    private void validateDeletedUser(final String beingDeletedUserId) {
+        if (!getSessionUser().getUserId().equals(beingDeletedUserId)) {
+            throw new GreenFarmException(GreenFarmErrorCode.INVALID_REQUEST_USER);
+        }
     }
 
     private SessionUser getSessionUser() {

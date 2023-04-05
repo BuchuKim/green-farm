@@ -19,15 +19,21 @@ public class RegisterUserDto {
     private String email;
 
     @NotBlank(message = "ID가 공란이어선 안됩니다!")
-    @Pattern(regexp = "^[a-zA-Z0-9]*$",message = "아이디는 숫자와 알파벳으로만 이루어져야 합니다!")
-    @Size(min=4,max = 15,message = "ID는 4자 이상 15자 이하의 길이여야 합니다!")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9]{3,14}$",
+            message = "아이디는 숫자와 알파벳으로만 이루어져야 합니다!")
+    @Size(min = 4,max = 15,
+            message = "ID는 4자 이상 15자 이하의 길이여야 합니다!")
     private String userId;
 
-    @NotBlank(message = "이름이 공란이어선 안됩니다!")
-    @Size(min = 1, max = 10, message = "이름은 10자 이하의 길이여야 합니다!")
+    @NotBlank(message = "닉네임이 공란이어선 안됩니다!")
+    @Pattern(regexp = "^[a-zA-Z가-힣][a-zA-Z가-힣0-9]{0,9}$",
+            message = "닉네임은 숫자, 한글, 알파벳으로만 이루어져야 합니다!")
+    @Size(min = 1, max = 10,
+            message = "닉네임은 10자 이하의 길이여야 합니다!")
     private String name;
 
-    @Size(max = 150, message = "자기소개는 150자 이하의 길이여야 합니다!")
+    @Size(max = 150,
+            message = "자기소개는 150자 이하의 길이여야 합니다!")
     private String bio;
 
     public static RegisterUserDto fromSession(SessionUser sessionUser) {
