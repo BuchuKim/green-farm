@@ -1,16 +1,22 @@
 package com.buchu.greenfarm.dto.farmLog;
 
 import com.buchu.greenfarm.entity.FarmLog;
-import com.buchu.greenfarm.entity.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
+@Slf4j
 public class FarmLogDto {
 
     private String logContent;
@@ -38,6 +44,8 @@ public class FarmLogDto {
     }
 
     private static String createdAtString(LocalDateTime createdAt) {
-        return DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").format(createdAt);
+        return DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
+                .withZone(ZoneId.of("Asia/Seoul")).format(
+                        createdAt.atZone(ZoneId.of("UTC")).toInstant());
     }
 }
