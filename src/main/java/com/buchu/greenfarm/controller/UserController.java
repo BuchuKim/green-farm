@@ -4,7 +4,10 @@ import com.buchu.greenfarm.config.auth.dto.SessionUser;
 import com.buchu.greenfarm.dto.user.UserDto;
 import com.buchu.greenfarm.dto.user.UserProfileDto;
 import com.buchu.greenfarm.entity.User;
+import com.buchu.greenfarm.exception.GreenFarmErrorCode;
+import com.buchu.greenfarm.exception.GreenFarmException;
 import com.buchu.greenfarm.repository.FarmLogRepository;
+import com.buchu.greenfarm.service.NotificationService;
 import com.buchu.greenfarm.service.UserService;
 import com.buchu.greenfarm.util.PageRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +31,7 @@ import java.util.Map;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final NotificationService notificationService;
     private final HttpSession httpSession;
 
     @GetMapping("/d-warn")
@@ -124,7 +128,26 @@ public class UserController {
         return "editUser.html";
     }
 
-    private SessionUser getSessionUser() {
-        return (SessionUser) httpSession.getAttribute("user");
+    @GetMapping("/notifications")
+    public String getNotificationPage(Model model) {
+        model.addAttribute("notifications",
+                notificationService.getNotificationDtos(
+                        getSessionUser().getUserId()));
+        return "notifications.html";
     }
+
+    @DeleteMapping("/notifications/{notificationId}")
+    public String deleteNotification() {
+        return "notifications.html";
+    }
+
+    private SessionUser getSessionUser() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new GreenFarmException(GreenFarmErrorCode.NEED_LOGIN);
+        } else {
+            return sessionUser;
+        }
+    }
+
 }

@@ -19,6 +19,7 @@ public enum GreenFarmErrorCode {
     NO_AVAILABLE_FOLLOWING("로그인 뒤 팔로우할 농장주를 찾아보세요."),
     INVALID_REQUEST_USER("요청에 적절한 사용자가 아닙니다."),
     ACCESS_DENIED("허용된 경로가 아닙니다."),
+    UNKNOWN_ALARM_ERROR("알 수 없는 알림입니다!"),
     NEED_LOGIN("로그인을 해주세요.");
     private final String detailMessage;
 }

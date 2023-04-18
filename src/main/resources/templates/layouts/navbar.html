@@ -20,6 +20,7 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" th:href="@{${'/'+session.user.userId}}">내 농장</a></li>
+                    <li><a class="dropdown-item" th:href="@{/notifications}">알림 확인</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <form th:action="@{/u/logout}" th:method="post">

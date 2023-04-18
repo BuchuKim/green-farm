@@ -49,7 +49,7 @@ public class FarmLogController {
             throw new GreenFarmException(GreenFarmErrorCode.INVALID_DATA);
         }
         return "redirect:/farm-log/" + String.valueOf(
-                farmLogService.getCreatedFarmLogId(request));
+                farmLogService.createFarmLogAndReturnFarmLogId(request));
     }
 
     @DeleteMapping(value = "/{id}")

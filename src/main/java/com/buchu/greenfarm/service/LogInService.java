@@ -41,6 +41,9 @@ public class LogInService {
 
     @Transactional
     private void validateRegisterRequest(@NonNull RegisterUserDto registerUserDto) {
+        if (registerUserDto.getUserId().equals("notifications")) {
+            throw new GreenFarmException(GreenFarmErrorCode.INVALID_USER_ID_ERROR);
+        }
         // no duplicated user ID
         userRepository.findByUserId(registerUserDto.getUserId())
                 .ifPresent((user) -> {

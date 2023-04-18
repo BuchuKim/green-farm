@@ -32,6 +32,7 @@ public class FarmLogService {
     private final UserRepository userRepository;
     private final GoodRepository goodRepository;
     private final HttpSession httpSession;
+    private final NotificationService notificationService;
 
     @Transactional
     public Map<String, Object> getAllFarmLogsPage(Pageable pageable,
@@ -70,11 +71,17 @@ public class FarmLogService {
     }
 
     @Transactional
-    public Long getCreatedFarmLogId(CreateFarmLog.Request request) {
+    public Long createFarmLogAndReturnFarmLogId(CreateFarmLog.Request request) {
+        User currentUser = getSessionUser();
+
+        notificationService.sendTagAlarm(
+                notificationService.searchTagList(request.getLogContent())
+        ,currentUser);
+
         return farmLogRepository.save(
                 FarmLog.builder()
                     .logContent(request.getLogContent())
-                    .author(getSessionUser())
+                    .author(currentUser)
                     .build())
                 .getFarmLogId();
     }
