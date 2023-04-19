@@ -17,8 +17,11 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
     public Optional<List<Notification>> findByReceivingUser(@Param("receivingUser") User receivingUser);
 
     @Modifying
-    @Query("DELETE FROM Notification n WHERE n NOT IN :notifications")
-    public void deleteExceptFor(@Param("notifications") List<Long> notifications);
+    @Query("DELETE FROM Notification n " +
+            "WHERE n.receivingUser = :receivingUser " +
+            "AND n.notificationId NOT IN :notifications")
+    public void deleteExceptFor(@Param("receivingUser") User receivingUser,
+                                @Param("notifications") List<Long> notifications);
 
     @Modifying
     public void deleteByReceivingUser(User receivingUser);

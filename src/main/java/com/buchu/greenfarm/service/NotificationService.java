@@ -91,7 +91,9 @@ public class NotificationService {
                         .findByReceivingUser(currentUser)
                 .orElse(new ArrayList<>());
 
-        notificationRepository.deleteExceptFor(notifications.stream().map(notification -> notification.getNotificationId()).toList());
+        notificationRepository.deleteExceptFor(
+                currentUser,
+                notifications.stream().map(notification -> notification.getNotificationId()).toList());
         return notifications
                 .stream().map(NotificationDto::fromEntity).toList();
     }
