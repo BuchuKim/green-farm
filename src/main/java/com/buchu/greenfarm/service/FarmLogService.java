@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class FarmLogService {
+    private final NotificationService notificationService;
     private final FarmLogRepository farmLogRepository;
     private final UserRepository userRepository;
     private final GoodRepository goodRepository;
@@ -70,13 +71,21 @@ public class FarmLogService {
     }
 
     @Transactional
-    public Long getCreatedFarmLogId(CreateFarmLog.Request request) {
-        return farmLogRepository.save(
+    public Long createFarmLogAndReturnFarmLogId(CreateFarmLog.Request request) {
+        User currentUser = getSessionUser();
+
+        FarmLog createdFarmLog = farmLogRepository.save(
                 FarmLog.builder()
-                    .logContent(request.getLogContent())
-                    .author(getSessionUser())
-                    .build())
-                .getFarmLogId();
+                        .logContent(request.getLogContent())
+                        .author(currentUser)
+                        .build());
+
+        notificationService.sendTagNotification(
+                notificationService.searchTagList(request.getLogContent())
+                ,currentUser,
+                createdFarmLog);
+
+        return createdFarmLog.getFarmLogId();
     }
 
     @Transactional
@@ -95,6 +104,7 @@ public class FarmLogService {
         if (goodRepository.findByLikerAndFarmLog(
                         sessionUser, farmLog)
                 .isEmpty()) {
+            notificationService.sendLikeNotification(sessionUser,farmLog);
             goodRepository.save(
                     Good.builder()
                             .liker(sessionUser)

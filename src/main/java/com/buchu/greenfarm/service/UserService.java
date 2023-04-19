@@ -35,6 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final FarmLogRepository farmLogRepository;
     private final FollowRepository followRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public UserDto getUserDetail(final User currentPageUser) {
@@ -102,11 +103,12 @@ public class UserService {
         User following = getUserByUserId(followingId);
         if (followRepository.findByFollowingAndFollowed(
                 following,followed).isEmpty()) {
-                followRepository.save(
-                        Follow.builder()
-                                .following(following)
-                                .followed(followed)
-                                .build());
+            notificationService.sendFollowNotification(following, followed);
+            followRepository.save(
+                    Follow.builder()
+                            .following(following)
+                            .followed(followed)
+                            .build());
         }
     }
 
