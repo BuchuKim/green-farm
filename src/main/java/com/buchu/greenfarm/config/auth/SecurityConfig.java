@@ -23,6 +23,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST,"/**").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/**").authenticated()
+                    .requestMatchers("/notifications").authenticated()
                     .requestMatchers("/u/register").hasRole("GUEST")
                     .requestMatchers("/*/follow").hasRole("USER")
                     .anyRequest().permitAll()

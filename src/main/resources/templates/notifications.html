@@ -18,28 +18,52 @@
 <!--  navbar.html 내의 nav fragment 대체   -->
 <div th:replace="~{layouts/navbar :: nav}">...</div>
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-10 col-lg-6 mb-3">
+    <div class="row justify-content-center mb-1">
+        <div class="col-10 col-lg-6 mb-1">
             <h1 class="text-center fw-bold"
                 th:text="${'🍀️ '+session.user.name + ' 님의 알림'}">
             </h1>
         </div>
+        <div>
+            <p class="text-center">알림은 최근 30개까지만 표시됩니다.</p>
+        </div>
     </div>
     <div class="row justify-content-center align-items-center mt-3">
-        <div class="col-9 col-lg-4">
+        <div class="col-10 col-lg-4">
             <div th:if="${#lists.isEmpty(notifications)}"
                  class="p-4">
                 <p class="text-muted text-center">알림이 존재하지 않습니다!</p>
             </div>
+            <div th:if="${not #lists.isEmpty(notifications)}"
+                 class="d-flex justify-content-center mb-3">
+                <form class="d-inline" th:action="@{'/notifications'}" th:method="delete">
+                    <button sec:authorize="isAuthenticated()"
+                            th:text="전체삭제"
+                            class="btn btn-outline-danger"></button>
+                </form>
+            </div>
             <ul class="list-group list-group-flush">
                 <a th:each="notification:${notifications}"
                    class="list-group-item list-group-item-action"
-                   th:href="${'/'+notification.notificationCode}">
-                    <span th:text="${notification.message}" class="fw-bold me-2"></span>
-<!--                    <span class="text-muted" th:text="${'@' + follower.userId}"></span>-->
-<!--                    <div class="mt-2">-->
-<!--                        <span th:text="${follower.bio}"></span>-->
-<!--                    </div>-->
+                   th:href="${'/'+notification.notificationURL}">
+                    <div class="d-flex">
+                        <span th:text="${notification.message}"
+                           class="fw-bold"></span>
+                        <span class="ms-auto">
+                            <form class="d-inline"
+                                  th:action="@{${'/notification/'+notification.id}}"
+                                  th:method="delete">
+                                    <button sec:authorize="isAuthenticated()"
+                                            th:text="${' ✕ '}"
+                                            class="btn btn-outline-danger"
+                                            type="submit"
+                                            style="position: relative;"></button>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="d-flex mt-1">
+                        <small class="text-muted" th:text="${notification.timePassed}"></small>
+                    </div>
                 </a>
             </ul>
         </div>

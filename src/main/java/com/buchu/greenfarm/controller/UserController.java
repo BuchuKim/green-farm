@@ -128,19 +128,6 @@ public class UserController {
         return "editUser.html";
     }
 
-    @GetMapping("/notifications")
-    public String getNotificationPage(Model model) {
-        model.addAttribute("notifications",
-                notificationService.getNotificationDtos(
-                        getSessionUser().getUserId()));
-        return "notifications.html";
-    }
-
-    @DeleteMapping("/notifications/{notificationId}")
-    public String deleteNotification() {
-        return "notifications.html";
-    }
-
     private SessionUser getSessionUser() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {

@@ -21,13 +21,13 @@ public class Notification extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
 
-    @ManyToOne @JoinColumn(name = "sending_user")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "sending_user")
     private User sendingUser;
 
-    @ManyToOne @JoinColumn(name = "receiving_user")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "receiving_user")
     private User receivingUser;
 
-    @OneToOne @JoinColumn(name = "farm_log")
+    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "farm_log")
     private FarmLog farmLog;
 
     private String message;

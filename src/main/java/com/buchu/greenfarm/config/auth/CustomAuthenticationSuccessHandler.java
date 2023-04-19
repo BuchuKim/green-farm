@@ -1,6 +1,7 @@
 package com.buchu.greenfarm.config.auth;
 
 import com.buchu.greenfarm.config.auth.dto.SessionUser;
+import com.buchu.greenfarm.service.NotificationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final HttpSession httpSession;
+    private final NotificationService notificationService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,

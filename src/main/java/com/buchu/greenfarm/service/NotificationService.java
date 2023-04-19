@@ -2,6 +2,7 @@ package com.buchu.greenfarm.service;
 
 import com.buchu.greenfarm.code.NotificationCode;
 import com.buchu.greenfarm.dto.NotificationDto;
+import com.buchu.greenfarm.entity.FarmLog;
 import com.buchu.greenfarm.entity.Notification;
 import com.buchu.greenfarm.entity.User;
 import com.buchu.greenfarm.exception.GreenFarmErrorCode;
@@ -36,7 +37,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public void sendTagAlarm(final List<String> taggedIds, final User taggingUser) {
+    public void sendTagNotification(final List<String> taggedIds,
+                             final User taggingUser,
+                             final FarmLog taggingFarmLog) {
         for (String id : taggedIds) {
             userRepository.findByUserId(id).ifPresent(
                     user -> {
@@ -45,6 +48,7 @@ public class NotificationService {
                                     .notificationCode(NotificationCode.TAG_ALARM)
                                     .sendingUser(taggingUser)
                                     .receivingUser(user)
+                                    .farmLog(taggingFarmLog)
                                     .isRead(false)
                                     .build());
                     }
@@ -53,13 +57,55 @@ public class NotificationService {
     }
 
     @Transactional
-    public List<NotificationDto> getNotificationDtos(final String userId) {
+    public void sendFollowNotification(final User followingUser,
+                                       final User followedUser) {
+        notificationRepository.save(
+                Notification.builder()
+                        .sendingUser(followingUser)
+                        .receivingUser(followedUser)
+                        .notificationCode(NotificationCode.FOLLOW_ALARM)
+                        .isRead(false)
+                        .build()
+        );
+    }
 
-        return notificationRepository.findByReceivingUser(
-                userRepository.findByUserId(userId)
-                        .orElseThrow(() -> new GreenFarmException(GreenFarmErrorCode.NO_USER_ERROR))
-        ).orElse(new ArrayList<>())
+    @Transactional
+    public void sendLikeNotification(final User sendingUser,
+                                     final FarmLog farmLog) {
+        notificationRepository.save(
+                Notification.builder()
+                        .sendingUser(sendingUser)
+                        .receivingUser(farmLog.getAuthor())
+                        .farmLog(farmLog)
+                        .notificationCode(NotificationCode.LIKE_ALARM)
+                        .build());
+    }
+
+    @Transactional
+    public List<NotificationDto> getNotificationDtos(final String userId) {
+        User currentUser = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new GreenFarmException(GreenFarmErrorCode.NO_USER_ERROR));
+
+        List<Notification> notifications =
+                notificationRepository
+                        .findByReceivingUser(currentUser)
+                .orElse(new ArrayList<>());
+
+        notificationRepository.deleteExceptFor(notifications.stream().map(notification -> notification.getNotificationId()).toList());
+        return notifications
                 .stream().map(NotificationDto::fromEntity).toList();
+    }
+
+    @Transactional
+    public void deleteNotification(final Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+    }
+
+    @Transactional
+    public void deleteAllNotifications(final String userId) {
+        notificationRepository.deleteByReceivingUser(
+                userRepository.findByUserId(userId).orElseThrow(
+                        () -> new GreenFarmException(GreenFarmErrorCode.NO_USER_ERROR)));
     }
 
 
