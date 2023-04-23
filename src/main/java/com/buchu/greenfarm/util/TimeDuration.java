@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class TimeDuration {
-    // 언젠간.. 쓰겠지... EB time configuration 완벽해지면..
     public static String generateTimeDuration(LocalDateTime dateTime) {
         LocalDateTime currentTime = LocalDateTime.now();
         if (ChronoUnit.HOURS.between(dateTime,currentTime)<1) {

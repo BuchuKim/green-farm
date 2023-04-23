@@ -32,11 +32,12 @@ public class Notification extends BaseEntity {
 
     private String message;
 
-    @NotNull
+    @NotNull @Enumerated(EnumType.STRING)
     private NotificationCode notificationCode;
 
     private Boolean isRead;
 
+    @Transient
     public String getMessage() {
         switch (notificationCode) {
             case TAG_ALARM -> {

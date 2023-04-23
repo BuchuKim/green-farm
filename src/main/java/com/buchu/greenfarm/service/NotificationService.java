@@ -93,7 +93,7 @@ public class NotificationService {
 
         notificationRepository.deleteExceptFor(
                 currentUser,
-                notifications.stream().map(notification -> notification.getNotificationId()).toList());
+                notifications.stream().map(Notification::getNotificationId).toList());
         return notifications
                 .stream().map(NotificationDto::fromEntity).toList();
     }
@@ -109,6 +109,5 @@ public class NotificationService {
                 userRepository.findByUserId(userId).orElseThrow(
                         () -> new GreenFarmException(GreenFarmErrorCode.NO_USER_ERROR)));
     }
-
 
 }
