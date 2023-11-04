@@ -1,5 +1,6 @@
 # GreenFarm Project
-[https://greenfarm-buchu.link](https://greenfarm-buchu.link)   
+AWS 프리티어 기간 만료로 도메인과 서버는 더이상 유효하지 않습니다.
+~[https://greenfarm-buchu.link](https://greenfarm-buchu.link)~   
 트위터와 유사한 일기 사이트 입니다. 간단한 소개는 프로젝트 링크의 "사이트 설명"란에서, 주요 기능과 사용 예시는 
 [블로그](https://buchu-doodle.tistory.com/160)에서 확인하실 수 있습니다.
 해당 블로그 동일 카테고리 글을 보시면 프로젝트의 전반적인 구현 과정을 확인하실 수 있습니다.   
